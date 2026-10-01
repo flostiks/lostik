@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOSTIK — Система</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: radial-gradient(circle at 50% 0%, #0d1a3a 0%, #050510 70%);
+            color: #c8d8ff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20% 30%, rgba(74, 108, 247, 0.6), transparent),
+                radial-gradient(2px 2px at 60% 70%, rgba(0, 201, 255, 0.5), transparent),
+                radial-gradient(1px 1px at 80% 20%, rgba(74, 108, 247, 0.7), transparent),
+                radial-gradient(1px 1px at 40% 90%, rgba(0, 201, 255, 0.4), transparent);
+            background-size: 200% 200%;
+            animation: stars 20s linear infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+        @keyframes stars {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+        .system {
+            max-width: 540px;
+            width: 100%;
+            background: linear-gradient(135deg, rgba(15, 25, 60, 0.95), rgba(10, 15, 40, 0.95));
+            border: 1px solid rgba(74, 140, 247, 0.5);
+            border-radius: 16px;
+            padding: 30px 25px;
+            box-shadow: 0 0 40px rgba(74, 108, 247, 0.4), inset 0 0 60px rgba(74, 108, 247, 0.05);
+            position: relative;
+            z-index: 2;
+            animation: systemAppear 0.8s ease-out;
+        }
+        @keyframes systemAppear {
+            0% { opacity: 0; transform: scale(0.9) translateY(20px); filter: blur(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
+        .system::before, .system::after {
+            content: '';
+            position: absolute;
+            width: 30px; height: 30px;
+            border: 2px solid #4a8cf7;
+        }
+        .system::before {
+            top: -1px; left: -1px;
+            border-right: none; border-bottom: none;
+            border-top-left-radius: 16px;
+        }
+        .system::after {
+            bottom: -1px; right: -1px;
+            border-left: none; border-top: none;
+            border-bottom-right-radius: 16px;
+        }
+        .system-title {
+            text-align: center;
+            font-size: 12px;
+            letter-spacing: 6px;
+            color: #4a8cf7;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(74, 140, 247, 0.8);
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .char-name {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+            text-shadow: 0 0 20px rgba(74, 140, 247, 0.8);
+            letter-spacing: 2px;
+        }
+        .char-class {
+            text-align: center;
+            font-size: 12px;
+            color: #8aa0d0;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+        .status-line {
+            text-align: center;
+            font-size: 14px;
+            color: #ffd700;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+        }
+        .title-line {
+            text-align: center;
+            font-size: 12px;
+            color: #ff8a00;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-shadow: 0 0 12px rgba(255, 138, 0, 0.6);
+        }
+        .date-line {
+            text-align: center;
+            font-size: 11px;
+            color: #4a8cf7;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            opacity: 0.7;
+        }
+        .level-block {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(74, 108, 247, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(74, 108, 247, 0.2);
+        }
+        .level-number {
+            font-size: 52px;
+            font-weight: bold;
+            color: #4a8cf7;
+            text-shadow: 0 0 30px rgba(74, 140, 247, 0.9);
+            line-height: 1;
+            animation: levelGlow 3s ease-in-out infinite;
+        }
+        @keyframes levelGlow {
+            0%, 100% { text-shadow: 0 0 20px rgba(74, 140, 247, 0.7); }
+            50% { text-shadow: 0 0 40px rgba(74, 140, 247, 1), 0 0 60px rgba(0, 201, 255, 0.5); }
+        }
+        .level-label {
+            font-size: 11px;
+            color: #8aa0d0;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+        .xp-bar-container {
+            width: 100%;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(74, 140, 247, 0.3);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        .xp-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4a6cf7, #00c9ff);
+            border-radius: 6px;
+            transition: width 0.6s ease;
+            box-shadow: 0 0 15px rgba(0, 201, 255, 0.8);
+        }
+        .xp-text {
+            text-align: center;
+            font-size: 12px;
+            color: #8aa0d0;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+        .stats {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(74, 108, 247, 0.06);
+            border: 1px solid rgba(74, 140, 247, 0.25);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .stat:hover {
+            background: rgba(74, 108, 247, 0.12);
+            border-color: #4a8cf7;
+            transform: translateX(5px);
+            box-shadow: 0 0 20px rgba(74, 140, 247, 0.3);
+        }
+        .stat-name {
+            font-size: 14px;
+            color: #b0c0e8;
+            letter-spacing: 1px;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00c9ff;
+            text-shadow: 0 0 10px rgba(0, 201, 255, 0.8);
+        }
+        .section-title {
+            font-size: 12px;
+            letter-spacing: 5px;
+            color: #4a8cf7;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(74, 140, 247, 0.6);
+        }
+        .stats-block, .achievements-block {
+            margin-bottom: 25px;
+            padding: 18px;
+            background: rgba(74, 108, 247, 0.05);
+            border: 1px solid rgba(74, 140, 247, 0.2);
+            border-radius: 12px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .stat-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(74, 140, 247, 0.15);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 11px;
+            color: #8aa0d0;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        .stat-num {
+            font-size: 22px;
+            font-weight: bold;
+            color: #00c9ff;
+            text-shadow: 0 0 10px rgba(0, 201, 255, 0.6);
+        }
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .achievement {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(74, 140, 247, 0.15);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .achievement.locked {
+            opacity: 0.35;
+            filter: grayscale(1);
+        }
+        .achievement.unlocked {
+            border-color: #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+        .ach-icon { font-size: 24px; margin-bottom: 6px; }
+        .ach-name {
+            font-size: 11px;
+            color: #d0d8f0;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+        .ach-xp { font-size: 10px; color: #ffd700; }
+        .quests-counter {
+            text-align: center;
+            font-size: 12px;
+            color: #8aa0d0;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        .quests-counter span {
+            color: #00c9ff;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(0, 201, 255, 0.6);
+        }
+        .quest {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            background: rgba(74, 108, 247, 0.05);
+            border: 1px solid rgba(74, 140, 247, 0.2);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: questAppear 0.5s ease-out backwards;
+        }
+        @keyframes questAppear {
+            0% { opacity: 0; transform: translateX(-30px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+        .quest::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0;
+            width: 3px; height: 100%;
+            background: linear-gradient(180deg, #4a6cf7, #00c9ff);
+            opacity: 0.5;
+        }
+        .quest:hover {
+            border-color: #4a8cf7;
+            background: rgba(74, 108, 247, 0.12);
+            box-shadow: 0 0 25px rgba(74, 140, 247, 0.3);
+            transform: translateX(5px);
+        }
+        .quest.mission {
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+        .quest.mission::before {
+            background: #ffd700;
+        }
+        .quest-info { flex: 1; }
+        .quest-name {
+            font-size: 14px;
+            color: #d0d8f0;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+        .quest-xp {
+            font-size: 12px;
+            color: #00c9ff;
+            text-shadow: 0 0 8px rgba(0, 201, 255, 0.5);
+        }
+        .quest-btn {
+            background: linear-gradient(90deg, #4a6cf7, #00c9ff);
+            border: none;
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0, 201, 255, 0.4);
+            letter-spacing: 1px;
+        }
+        .quest-btn:hover:not(:disabled) {
+            transform: scale(1.08);
+            box-shadow: 0 0 25px rgba(0, 201, 255, 0.8);
+        }
+        .quest-btn:disabled {
+            opacity: 0.4;
+            cursor: default;
+            transform: none;
+            box-shadow: none;
+        }
+        .quest.done {
+            opacity: 0.5;
+            border-color: #00c853;
+        }
+        .quest.done::before { background: #00c853; }
+        .quest.done .quest-btn {
+            background: #00c853;
+            box-shadow: 0 0 15px rgba(0, 200, 83, 0.6);
+        }
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .reset-btn, .newday-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+        .newday-btn {
+            background: linear-gradient(90deg, #4a6cf7, #00c9ff);
+            border: none;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(0, 201, 255, 0.4);
+        }
+        .newday-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 25px rgba(0, 201, 255, 0.8);
+        }
+        .reset-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 23, 68, 0.5);
+            color: #ff5577;
+        }
+        .reset-btn:hover {
+            background: rgba(255, 23, 68, 0.1);
+            border-color: #ff1744;
+            box-shadow: 0 0 15px rgba(255, 23, 68, 0.4);
+        }
+        .level-up-flash { animation: levelUpFlash 1.5s ease-out; }
+        @keyframes levelUpFlash {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.3); filter: brightness(2); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        .status-change-flash { animation: statusFlash 2s ease-out; }
+        @keyframes statusFlash {
+            0% { color: #ffd700; text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8a00; }
+            100% { color: #ffd700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.7); }
+        }
+        .achievement-popup {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-200px);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(255, 140, 0, 0.95));
+            color: #000;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: bold;
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+            z-index: 100;
+            text-align: center;
+            transition: transform 0.5s ease;
+        }
+        .achievement-popup.show { transform: translateX(-50%) translateY(0); }
+        .achievement-popup .popup-icon { font-size: 30px; margin-bottom: 5px; }
+        .achievement-popup .popup-title {
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+        .achievement-popup .popup-name { font-size: 18px; margin-top: 3px; }
+    </style>
+</head>
+<body>
+    <div class="achievement-popup" id="achievementPopup">
+        <div class="popup-icon" id="popupIcon">🏅</div>
+        <div class="popup-title">Достижение открыто</div>
+        <div class="popup-name" id="popupName"></div>
+    </div>
+
+    <div class="system">
+        <div class="system-title">⚔ Система активна</div>
+        <div class="char-name">LOST1K</div>
+        <div class="char-class">Теневой Бард</div>
+        <div class="status-line" id="statusLine">НОВИЧОК</div>
+        <div class="title-line" id="titleLine"></div>
+        <div class="date-line" id="dateLine"></div>
+
+        <div class="level-block">
+            <div class="level-number" id="level">1</div>
+            <div class="level-label">Уровень</div>
+            <div class="xp-bar-container">
+                <div class="xp-bar" id="xpBar"></div>
+            </div>
+            <div class="xp-text"><span id="xp">0</span> / <span id="xpMax">100</span> XP</div>
+        </div>
+
+        <div class="stats">
+            <div class="stat"><span class="stat-name">💪 СИЛА</span><span class="stat-value" id="strength">1</span></div>
+            <div class="stat"><span class="stat-name">🏃 ЛОВКОСТЬ</span><span class="stat-value" id="agility">1</span></div>
+            <div class="stat"><span class="stat-name">👁 ВОСПРИЯТИЕ</span><span class="stat-value" id="perception">1</span></div>
+            <div class="stat"><span class="stat-name">❤️ ВЫНОСЛИВОСТЬ</span><span class="stat-value" id="stamina">1</span></div>
+            <div class="stat"><span class="stat-name">🧠 ИНТЕЛЛЕКТ</span><span class="stat-value" id="intelligence">1</span></div>
+        </div>
+
+        <div class="achievements-block">
+            <div class="section-title">Достижения</div>
+            <div class="achievements-grid" id="achievementsGrid"></div>
+        </div>
+
+        <div class="stats-block">
+            <div class="section-title">Статистика</div>
+            <div class="stats-grid">
+                <div class="stat-item"><div class="stat-label">Всего XP</div><div class="stat-num" id="totalXP">0</div></div>
+                <div class="stat-item"><div class="stat-label">Квестов выполнено</div><div class="stat-num" id="totalQuests">0</div></div>
+                <div class="stat-item"><div class="stat-label">Повышений уровня</div><div class="stat-num" id="levelUps">0</div></div>
+                <div class="stat-item"><div class="stat-label">Дней подряд</div><div class="stat-num" id="streak">0</div></div>
+            </div>
+        </div>
+
+        <div class="section-title">Ежедневные квесты</div>
+        <div class="quests-counter">Выполнено: <span id="doneCount">0</span> / <span id="totalCount">16</span></div>
+        <div id="quests"></div>
+
+        <div class="btn-row">
+            <button class="newday-btn" id="newDayBtn">Новый день</button>
+            <button class="reset-btn" id="resetBtn">Сбросить всё</button>
+        </div>
+    </div>
+
+    <script>
+        var defaultState = {
+            level: 1, xp: 0, xpMax: 100,
+            strength: 1, agility: 1, perception: 1, stamina: 1, intelligence: 1,
+            questsDone: [], lastReset: new Date().toDateString(),
+            totalXP: 0, totalQuests: 0, levelUps: 0, streak: 0,
+            lastActiveDate: null, achievements: [],
+            dailyMission: null, title: null
+        };
+
+        var quests = [
+            { id: 'q1', name: 'Вода утром + умывание', xp: 10, attribute: 'stamina' },
+            { id: 'q2', name: 'Завтрак (белок 30г+)', xp: 15, attribute: 'stamina' },
+            { id: 'q3', name: 'Тренировка (верх/низ/кардио)', xp: 40, attribute: 'strength' },
+            { id: 'q4', name: 'Вода 2 литра', xp: 15, attribute: 'stamina' },
+            { id: 'q5', name: 'Питание: белок 150г+, без сладкого', xp: 25, attribute: 'stamina' },
+            { id: 'q6', name: 'Чтение: 1 закон «48 законов власти»', xp: 15, attribute: 'intelligence' },
+            { id: 'q7', name: 'Кодинг LOSTIK: 45 минут', xp: 20, attribute: 'intelligence' },
+            { id: 'q8', name: 'Менталист: 1 серия', xp: 10, attribute: 'perception' },
+            { id: 'q9', name: 'Уход за кожей', xp: 10, attribute: 'agility' },
+            { id: 'q10', name: 'Отбой до 22:00', xp: 20, attribute: 'agility' },
+            { id: 's1', name: 'Скаутинг: изучить мануал (глава)', xp: 15, attribute: 'intelligence' },
+            { id: 's2', name: 'Скаутинг: найти 5 кандидаток', xp: 20, attribute: 'perception' },
+            { id: 's3', name: 'Скаутинг: написать 10 сообщений', xp: 25, attribute: 'agility' },
+            { id: 's4', name: 'Скаутинг: отработать 1 возражение', xp: 20, attribute: 'intelligence' },
+            { id: 's5', name: 'Скаутинг: получить 1 ответ', xp: 30, attribute: 'agility' },
+            { id: 's6', name: 'Скаутинг: создать 1 анкету в CRM', xp: 35, attribute: 'perception' }
+        ];
+
+        var statuses = [
+            { min: 1, max: 4, name: 'НОВИЧОК' },
+            { min: 5, max: 9, name: 'УЧЕНИК' },
+            { min: 10, max: 14, name: 'ВОИН' },
+            { min: 15, max: 19, name: 'ВЕТЕРАН' },
+            { min: 20, max: 29, name: 'МАСТЕР' },
+            { min: 30, max: 49, name: 'ГРАНДМАСТЕР' },
+            { min: 50, max: 74, name: 'ЛЕГЕНДА' },
+            { min: 75, max: 99, name: 'ТЕНЬ' },
+            { min: 100, max: 9999, name: 'МОНАРХ' }
+        ];
+
+        var titles = [
+            { days: 3, name: 'Стабильный' },
+            { days: 7, name: 'Дисциплинированный' },
+            { days: 14, name: 'Несгибаемый' },
+            { days: 30, name: 'Железная воля' },
+            { days: 100, name: 'Монарх дисциплины' }
+        ];
+
+        var achievements = [
+            { id: 'first_blood', name: 'Первая кровь', icon: '🩸', xp: 20,
+              check: function(s) { return s.totalQuests >= 1; } },
+            { id: 'perfect_day', name: 'Идеальный день', icon: '⭐', xp: 100,
+              check: function(s) { return s.questsDone.length >= 16; } },
+            { id: 'week_streak', name: 'Неделя силы', icon: '🔥', xp: 150,
+              check: function(s) { return s.streak >= 7; } },
+            { id: 'scout_5', name: 'Скаут-новичок', icon: '🎯', xp: 50,
+              check: function(s) {
+                  var c = 0;
+                  for (var i = 0; i < s.questsDone.length; i++) {
+                      if (s.questsDone[i].charAt(0) === 's') c++;
+                  }
+                  return c >= 5;
+              } },
+            { id: 'bookworm', name: 'Книжный червь', icon: '📖', xp: 80,
+              check: function(s) { return s.totalQuests >= 10; } },
+            { id: 'iron_man', name: 'Железный человек', icon: '💪', xp: 120,
+              check: function(s) { return s.strength >= 15; } }
+        ];
+
+        var state = loadState();
+
+        function loadState() {
+            var saved = localStorage.getItem('lostik_state');
+            var st;
+            if (saved) {
+                try { st = JSON.parse(saved); } catch(e) { st = Object.assign({}, defaultState); }
+            } else {
+                st = Object.assign({}, defaultState);
+            }
+            if (!st.achievements) st.achievements = [];
+            var today = new Date().toDateString();
+            if (st.lastReset !== today) {
+                st.questsDone = [];
+                st.lastReset = today;
+                localStorage.setItem('lostik_state', JSON.stringify(st));
+            }
+            return st;
+        }
+
+        function saveState() {
+            localStorage.setItem('lostik_state', JSON.stringify(state));
+        }
+
+        function getStatusByLevel(level) {
+            for (var i = 0; i < statuses.length; i++) {
+                if (level >= statuses[i].min && level <= statuses[i].max) {
+                    return statuses[i].name;
+                }
+            }
+            return 'МОНАРХ';
+        }
+
+        function getTitleByStreak(streak) {
+            var title = null;
+            for (var i = 0; i < titles.length; i++) {
+                if (streak >= titles[i].days) title = titles[i].name;
+            }
+            return title;
+        }
+
+        function getOrCreateDailyMission() {
+            var today = new Date().toDateString();
+            if (state.dailyMission && state.dailyMission.date === today) {
+                return state.dailyMission.id;
+            }
+            var randomIndex = Math.floor(Math.random() * quests.length);
+            state.dailyMission = { id: quests[randomIndex].id, date: today };
+            saveState();
+            return state.dailyMission.id;
+        }
+
+        function updateDate() {
+            var now = new Date();
+            var days = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
+            var months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+            document.getElementById('dateLine').textContent = days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()];
+        }
+
+        function renderAchievements() {
+            var grid = document.getElementById('achievementsGrid');
+            grid.innerHTML = '';
+            achievements.forEach(function(a) {
+                var unlocked = state.achievements.indexOf(a.id) !== -1;
+                var div = document.createElement('div');
+                div.className = 'achievement ' + (unlocked ? 'unlocked' : 'locked');
+                div.innerHTML =
+                    '<div class="ach-icon">' + a.icon + '</div>' +
+                    '<div class="ach-name">' + a.name + '</div>' +
+                    '<div class="ach-xp">+' + a.xp + ' XP</div>';
+                grid.appendChild(div);
+            });
+        }
+
+        function showAchievementPopup(a) {
+            var popup = document.getElementById('achievementPopup');
+            document.getElementById('popupIcon').textContent = a.icon;
+            document.getElementById('popupName').textContent = a.name;
+            popup.classList.add('show');
+            setTimeout(function() { popup.classList.remove('show'); }, 3000);
+        }
+
+        function checkAchievements() {
+            achievements.forEach(function(a) {
+                if (state.achievements.indexOf(a.id) === -1 && a.check(state)) {
+                    state.achievements.push(a.id);
+                    state.totalXP += a.xp;
+                    state.xp += a.xp;
+                    while (state.xp >= state.xpMax) {
+                        state.xp -= state.xpMax;
+                        state.level += 1;
+                        state.xpMax = Math.round(state.xpMax * 1.25);
+                        state.levelUps += 1;
+                    }
+                    saveState();
+                    showAchievementPopup(a);
+                }
+            });
+        }
+
+        function render() {
+            document.getElementById('level').textContent = state.level;
+            document.getElementById('xp').textContent = state.xp;
+            document.getElementById('xpMax').textContent = state.xpMax;
+            document.getElementById('xpBar').style.width = (state.xp / state.xpMax * 100) + '%';
+            document.getElementById('strength').textContent = state.strength;
+            document.getElementById('agility').textContent = state.agility;
+            document.getElementById('perception').textContent = state.perception;
+            document.getElementById('stamina').textContent = state.stamina;
+            document.getElementById('intelligence').textContent = state.intelligence;
+            document.getElementById('totalXP').textContent = state.totalXP;
+            document.getElementById('totalQuests').textContent = state.totalQuests;
+            document.getElementById('levelUps').textContent = state.levelUps;
+            document.getElementById('streak').textContent = state.streak;
+            document.getElementById('statusLine').textContent = getStatusByLevel(state.level);
+            var title = getTitleByStreak(state.streak);
+            document.getElementById('titleLine').textContent = title ? '⚔ ' + title : '';
+            document.getElementById('doneCount').textContent = state.questsDone.length;
+            document.getElementById('totalCount').textContent = quests.length;
+
+            var container = document.getElementById('quests');
+            container.innerHTML = '';
+            quests.forEach(function(q) {
+                var done = state.questsDone.indexOf(q.id) !== -1;
+                var isMission = state.dailyMission && state.dailyMission.id === q.id;
+                var div = document.createElement('div');
+                div.className = 'quest' + (done ? ' done' : '') + (isMission ? ' mission' : '');
+                var info = document.createElement('div');
+                info.className = 'quest-info';
+                var name = document.createElement('div');
+                name.className = 'quest-name';
+                name.textContent = q.name + (isMission ? ' ⭐ МИССИЯ ДНЯ' : '');
+                var xp = document.createElement('div');
+                xp.className = 'quest-xp';
+                xp.textContent = '+' + (isMission ? q.xp * 2 : q.xp) + ' XP';
+                info.appendChild(name);
+                info.appendChild(xp);
+                var btn = document.createElement('button');
+                btn.className = 'quest-btn';
+                btn.disabled = done;
+                btn.textContent = done ? '✓ ВЫПОЛНЕНО' : 'ВЫПОЛНИТЬ';
+                btn.addEventListener('click', function() { completeQuest(q.id); });
+                div.appendChild(info);
+                div.appendChild(btn);
+                container.appendChild(div);
+            });
+            renderAchievements();
+        }
+
+        function completeQuest(id) {
+            var quest = null;
+            for (var i = 0; i < quests.length; i++) {
+                if (quests[i].id === id) { quest = quests[i]; break; }
+            }
+            if (!quest) return;
+            if (state.questsDone.indexOf(id) !== -1) return;
+
+            var isMission = state.dailyMission &&
+                            state.dailyMission.id === id;
+
+            var xpGain = quest.xp * (isMission ? 2 : 1);
+
+            state.questsDone.push(id);
+            state.xp += xpGain;
+            state.totalXP += xpGain;
+            state.totalQuests += 1;
+
+            if (quest.attribute && state[quest.attribute] !== undefined) {
+                state[quest.attribute] += 1;
+            }
+
+            var today = new Date().toDateString();
+            if (state.lastActiveDate !== today) {
+                var yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                if (state.lastActiveDate === yesterday.toDateString()) {
+                    state.streak += 1;
+                } else {
+                    state.streak = 1;
+                }
+                state.lastActiveDate = today;
+            }
+
+            var oldStatus = getStatusByLevel(state.level);
+            var leveledUp = false;
+            while (state.xp >= state.xpMax) {
+                state.xp -= state.xpMax;
+                state.level += 1;
+                state.xpMax = Math.round(state.xpMax * 1.25);
+                state.levelUps += 1;
+                leveledUp = true;
+            }
+            var newStatus = getStatusByLevel(state.level);
+
+            checkAchievements();
+            saveState();
+            render();
+
+            if (leveledUp) {
+                var lvl = document.getElementById('level');
+                lvl.classList.add('level-up-flash');
+                setTimeout(function() { lvl.classList.remove('level-up-flash'); }, 1500);
+            }
+
+            if (oldStatus !== newStatus) {
+                var statusEl = document.getElementById('statusLine');
+                statusEl.classList.add('status-change-flash');
+                setTimeout(function() { statusEl.classList.remove('status-change-flash'); }, 2000);
+            }
+        }
+
+        function newDay() {
+            if (confirm('Начать новый день? Квесты сбросятся, уровень и ачивки останутся.')) {
+                state.questsDone = [];
+                state.lastReset = new Date().toDateString();
+                saveState();
+                render();
+                updateDate();
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('Сбросить ВЕСЬ прогресс? Это нельзя отменить.')) {
+                state = Object.assign({}, defaultState);
+                state.lastReset = new Date().toDateString();
+                saveState();
+                render();
+                updateDate();
+            }
+        }
+
+        document.getElementById('newDayBtn').addEventListener('click', newDay);
+        document.getElementById('resetBtn').addEventListener('click', resetProgress);
+
+        getOrCreateDailyMission();
+        updateDate();
+        render();
+    </script>
+</body>
+</html>
