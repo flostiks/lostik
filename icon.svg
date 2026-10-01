@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="portalGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#00c9ff" stop-opacity="0.9"/>
+      <stop offset="40%" stop-color="#4a6cf7" stop-opacity="0.7"/>
+      <stop offset="80%" stop-color="#1a1a4a" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#0a0a12" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="portalCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="30%" stop-color="#00c9ff" stop-opacity="0.9"/>
+      <stop offset="70%" stop-color="#4a6cf7" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#0a0a12" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="swordBlade" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#c8d8ff"/>
+      <stop offset="100%" stop-color="#8aa0d0"/>
+    </linearGradient>
+    <linearGradient id="swordEdge" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00c9ff"/>
+      <stop offset="100%" stop-color="#4a6cf7"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Фон -->
+  <rect width="512" height="512" fill="#0a0a12"/>
+
+  <!-- Внешнее свечение портала -->
+  <circle cx="256" cy="256" r="240" fill="url(#portalGlow)" filter="url(#glow)"/>
+
+  <!-- Кольца портала -->
+  <circle cx="256" cy="256" r="200" fill="none" stroke="#4a6cf7" stroke-width="4" opacity="0.4"/>
+  <circle cx="256" cy="256" r="170" fill="none" stroke="#00c9ff" stroke-width="3" opacity="0.6"/>
+  <circle cx="256" cy="256" r="140" fill="none" stroke="#4a6cf7" stroke-width="2" opacity="0.8"/>
+
+  <!-- Ядро портала -->
+  <circle cx="256" cy="256" r="130" fill="url(#portalCore)" filter="url(#glow)"/>
+
+  <!-- Меч: рукоять -->
+  <rect x="240" y="360" width="32" height="80" rx="6" fill="#2a2a4a" stroke="#4a6cf7" stroke-width="2"/>
+  <rect x="228" y="350" width="56" height="20" rx="4" fill="#4a6cf7" stroke="#00c9ff" stroke-width="2"/>
+  <circle cx="256" cy="440" r="10" fill="#00c9ff" filter="url(#glow)"/>
+
+  <!-- Меч: клинок -->
+  <polygon points="256,80 276,180 276,350 236,350 236,180" fill="url(#swordBlade)"/>
+  <polygon points="256,80 276,180 276,350 236,350 236,180" fill="none" stroke="url(#swordEdge)" stroke-width="2" filter="url(#glow)"/>
+
+  <!-- Остриё -->
+  <polygon points="256,80 266,130 246,130" fill="#ffffff" filter="url(#glow)"/>
+
+  <!-- Блик на клинке -->
+  <line x1="256" y1="140" x2="256" y2="340" stroke="#ffffff" stroke-width="1" opacity="0.8"/>
+
+  <!-- Текст LOSTIK -->
+  <text x="256" y="490" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#00c9ff" letter-spacing="4" filter="url(#glow)">LOSTIK</text>
+
+  <!-- Уголки системы -->
+  <path d="M 30 30 L 30 80 M 30 30 L 80 30" stroke="#4a6cf7" stroke-width="4" fill="none" filter="url(#glow)"/>
+  <path d="M 482 30 L 482 80 M 482 30 L 432 30" stroke="#4a6cf7" stroke-width="4" fill="none" filter="url(#glow)"/>
+  <path d="M 30 482 L 30 432 M 30 482 L 80 482" stroke="#4a6cf7" stroke-width="4" fill="none" filter="url(#glow)"/>
+  <path d="M 482 482 L 482 432 M 482 482 L 432 482" stroke="#4a6cf7" stroke-width="4" fill="none" filter="url(#glow)"/>
+</svg>
